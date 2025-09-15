@@ -1,0 +1,30 @@
+version: 2
+
+seeds:
+  - name: raw_credit_card_data
+    config:
+      column_types:
+        ID: INT64
+        LIMIT_BAL: FLOAT64
+        SEX: INT64
+        EDUCATION: INT64
+        MARRIAGE: INT64
+        AGE: INT64
+        PAY_0: INT64
+        PAY_2: INT64
+        PAY_3: INT64
+        PAY_4: INT64
+        PAY_5: INT64
+        PAY_6: INT64
+        BILL_AMT1: FLOAT64
+        BILL_AMT2: FLOAT64
+        BILL_AMT3: FLOAT64
+        BILL_AMT4: FLOAT64
+        BILL_AMT5: FLOAT64
+        BILL_AMT6: FLOAT64
+        PAY_AMT1: FLOAT64
+        PAY_AMT2: FLOAT64
+        PAY_AMT3: FLOAT64
+        PAY_AMT4: FLOAT64
+        PAY_AMT5: FLOAT64
+        PAY_AMT6: FLOAT64
