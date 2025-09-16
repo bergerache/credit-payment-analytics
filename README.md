@@ -119,15 +119,13 @@ The documentation includes:
 ## 📊 Key Findings
 
 ### Portfolio Distribution
-```
-┌────────────────────┬──────────┬────────────┐
-│ Segment            │ % Customers│ Action    │
-├────────────────────┼──────────┼────────────┤
-│ 📈 Growth Eligible │ 8.3%     │ Increase   │
-│ ✅ Stable         │ 60.0%    │ Maintain   │
-│ ⚠️ Monitor        │ 23.3%    │ Watch      │
-│ 🚨 High Risk      │ 8.3%     │ Review     │
-└────────────────────┴──────────┴────────────┘
+
+| Segment | % Customers | Action |
+|---------|-------------|--------|
+| 📈 Growth Eligible | 8.3% | Increase |
+| ✅ Stable | 60.0% | Maintain |
+| ⚠️ Monitor | 23.3% | Watch |
+| 🚨 High Risk | 8.3% | Review |
 ```
 
 ## 🧪 Testing Strategy
@@ -144,7 +142,7 @@ The documentation includes:
 ```bash
 Completed successfully
 ================== 
-✓ 16 tests passed
+✓ 27 tests passed
 ✗ 0 tests failed
 ⚠ 0 warnings
 ```
