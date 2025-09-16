@@ -1,0 +1,24 @@
+
+# dbt
+target/
+dbt_packages/
+logs/
+
+# Ignore all CSVs except the seed
+*.csv
+!seeds/raw_credit_card_data.csv
+
+# OS
+.DS_Store
+
+# IDE
+.vscode/
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.env
+
+# Documentation
+site/  # If using dbt docs
