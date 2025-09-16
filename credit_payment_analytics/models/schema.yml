@@ -1,0 +1,80 @@
+version: 2
+
+models:
+  - name: stg_credit_card_data
+    description: "Staging layer with decoded categorical values and human-readable payment statuses"
+    columns:
+      - name: customer_id
+        tests:
+          - unique
+          - not_null
+      - name: credit_limit
+        tests:
+          - not_null
+    
+  - name: int_payment_performance
+    description: "Customer value scoring based on payment behaviour - prioritises revolvers over 'deadbeats'"
+    columns:
+      - name: customer_id
+        tests:
+          - unique
+          - not_null
+      - name: customer_value_score
+        description: "Business value score (0-100) prioritising revolvers over full payers"
+        tests:
+          - not_null
+          - positive_values  # Score should be positive
+      - name: full_payment_count
+        tests:
+          - not_null
+      - name: late_payment_count
+        tests:
+          - not_null
+    
+  - name: int_utilisation_analysis
+    description: "Credit utilisation patterns showing usage intensity and consistency"
+    columns:
+      - name: customer_id
+        tests:
+          - unique
+          - not_null
+      - name: credit_limit
+        tests:
+          - not_null
+      - name: avg_utilisation_pct
+        tests:
+          - not_null
+      - name: max_utilisation_pct
+        tests:
+          - not_null
+    
+  - name: mart_customer_credit_profile
+    description: "Complete customer view for credit decisions"
+    columns:
+      - name: customer_id
+        tests:
+          - unique
+          - not_null
+      - name: recommended_action
+        description: "Credit decision: INCREASE_LIMIT, MAINTAIN, MONITOR, or REVIEW_ACCOUNT"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['INCREASE_LIMIT', 'MAINTAIN', 'MONITOR', 'REVIEW_ACCOUNT']
+      - name: customer_value_score
+        tests:
+          - not_null
+    
+  - name: mart_credit_portfolio_summary
+    description: "Executive dashboard aggregating portfolio by recommended actions"
+    columns:
+      - name: recommended_action
+        tests:
+          - unique  # Each action should appear once
+          - not_null
+          - accepted_values:
+              values: ['INCREASE_LIMIT', 'MAINTAIN', 'MONITOR', 'REVIEW_ACCOUNT']
+      - name: customer_count
+        tests:
+          - not_null
+          - positive_values  
