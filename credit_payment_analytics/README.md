@@ -142,7 +142,7 @@ The documentation includes:
 ```bash
 Completed successfully
 ================== 
-✓ 16 tests passed
+✓ 27 tests passed
 ✗ 0 tests failed
 ⚠ 0 warnings
 ```
