@@ -23,7 +23,12 @@ SELECT
     -- Payment behaviour
     pm.full_payment_count,
     pm.late_payment_count,
+    pm.overpaid_count,
+    pm.minimum_payment_count,
     pm.customer_value_score,
+    pm.avg_balance,  
+    pm.total_paid,
+    pm.total_billed,
     
     -- Utilisation patterns
     um.avg_utilisation_pct,
@@ -32,12 +37,37 @@ SELECT
     um.utilisation_range,
     
     -- Business decisions
-    CASE 
-        WHEN pm.customer_value_score >= 80 AND um.avg_utilisation_pct BETWEEN 30 AND 70 THEN 'INCREASE_LIMIT'
-        WHEN pm.customer_value_score >= 60 AND um.months_over_limit = 0 THEN 'MAINTAIN'
-        WHEN pm.customer_value_score < 35 OR um.months_over_limit > 2 THEN 'REVIEW_ACCOUNT'
-        ELSE 'MONITOR'
-    END as recommended_action
+   CASE 
+    -- High-value customers with room to grow
+    WHEN pm.customer_value_score >= 80 
+        AND um.avg_utilisation_pct BETWEEN 50 AND 75
+    THEN 'INCREASE_LIMIT'
+    
+    -- Premium customers with risk signals
+    WHEN pm.customer_value_score >= 80 
+        AND um.avg_utilisation_pct > 85
+    THEN 'MONITOR'
+    
+    -- High-value customers well-managed 
+    WHEN pm.customer_value_score >= 80 
+        AND um.avg_utilisation_pct <= 85  
+    THEN 'MAINTAIN'
+    
+    -- Standard customers in good standing
+    WHEN pm.customer_value_score >= 60 
+        AND um.avg_utilisation_pct <= 85
+    THEN 'MAINTAIN'
+    
+    -- Clear risk signals requiring review
+    WHEN pm.customer_value_score <= 40
+        OR um.avg_utilisation_pct > 95
+        OR (pm.customer_value_score < 60 AND um.avg_utilisation_pct > 90)
+    THEN 'REVIEW_ACCOUNT'
+    
+    ELSE 'MONITOR'
+
+    
+END as recommended_action
 
 FROM customer_base cb
 LEFT JOIN payment_metrics pm ON cb.customer_id = pm.customer_id
