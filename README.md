@@ -13,6 +13,12 @@ Traditional credit scoring focuses on risk minimisation. This project takes a **
 ### 💰 Key Business Insight
 > "Good customers pay eventually. Great customers pay forever (in interest)."
 
+### 💡 Key Discoveries from EDA
+- **"Paid in full" ≠ Zero balance**: 90% of customers marked as paying in full still carry debt
+- **Account in credit** (status -2): 7.6% of these customers have overpaid - lowest risk but unprofitable
+- **Minimum payment only** (status 0): Most profitable customers when managed well
+- **Payment status reflects statement balance**, not total debt
+
 ## 📈 Data Source
 - **Dataset**: UCI Credit Card Clients Dataset (2005)
 - **Size**: 30,000 customers
@@ -23,41 +29,73 @@ Traditional credit scoring focuses on risk minimisation. This project takes a **
 
 ### Data Flow
 ```
-seeds/                → Raw CSV data
+EDA Analysis          → Discovered true payment status meanings
   ↓
-staging/              → Decoded categorical variables  
+seeds/               → Raw CSV data with corrected interpretations
   ↓
-intermediate/         → Business calculations
+staging/             → Decoded with business-accurate labels
   ↓
-marts/               → Decision-ready tables
+intermediate/        → 5-tier scoring system + utilisation analysis
+  ↓
+marts/              → Action-oriented decisions
 ```
+
 ![Data Pipeline DAG](images/DAG.png)
 
 ## 🧮 Key Business Logic
 
-### Customer Value Score (0-100)
-Prioritises profitable customers over "deadbeats" (those who pay in full):
+### Customer Value Score (Discrete Values)
+Prioritises profitable revolvers who generate interest revenue:
 
-| Score Range | Customer Type | Business Action |
-|------------|---------------|-----------------|
-| 🟢 80-100 | High-value revolvers | Increase limits |
-| 🟡 40-60 | Acceptable risk | Maintain |
-| 🔴 0-40 | High-risk segments | Review account |
+| Score | Customer Segment | Criteria | Business Value |
+|-------|-----------------|----------|----------------|
+| 🟢 100 | Premium Revolvers | No late, 3+ minimum payments, >$1000 avg balance | Highest profit potential |
+| 🟢 80 | Standard Good | No late payments, >$500 avg balance | Reliable revenue |
+| 🟡 60 | Acceptable Risk | 1 late payment OR low balance | Monitor for improvement |
+| 🟠 40 | Multiple Risks | 2 late payments OR frequent overpayments | Intervention needed |
+| 🔴 30 | Dormant | Minimal activity, <$100 avg balance | Re-engagement opportunity |
+| 🔴 20 | Unusual Pattern | Edge cases | Manual review required |
+| 🔴 15 | High Risk | 3+ late payments | Collections focus |
 
-### 📊 Utilisation Analysis
-- ✅ Tracks credit usage patterns and volatility
-- ✅ Identifies over-limit incidents
-- ✅ Flags capacity for credit increases
+### 🎯 Recommended Actions Logic
+
+| Action | Criteria | Business Rationale |
+|--------|----------|-------------------|
+| **INCREASE_LIMIT** | Score ≥80 AND 50-75% utilisation | Active, profitable, room to grow |
+| **MAINTAIN** | Score ≥60 AND ≤85% utilisation | Stable, well-managed accounts |
+| **MONITOR** | Score ≥80 with >85% utilisation OR other warning signs | Risk emerging despite good history |
+| **REVIEW_ACCOUNT** | Score ≤40 OR >95% utilisation | Immediate intervention required |
+
+### Risk Overrides
+Even premium customers (score 80-100) are flagged for monitoring if:
+- Utilisation exceeds 85% (financial stress indicator)
+- Multiple months over credit limit (capacity issues)
 
 ## 📂 Models
 
-| Model | Type | Purpose | Records |
-|-------|------|---------|---------|
-| `stg_credit_card_data` | View | Transforms numeric codes to readable text | 30,000 |
-| `int_payment_performance` | Table | Calculates payment reliability and customer value | 30,000 |
-| `int_utilisation_analysis` | Table | Analyses credit usage patterns | 30,000 |
-| `mart_customer_credit_profile` | Table | Complete customer view for decisions | 30,000 |
-| `mart_credit_portfolio_summary` | Table | Executive dashboard by risk segment | 4 |
+| Model | Type | Purpose | Key Metrics |
+|-------|------|---------|-------------|
+| `stg_credit_card_data` | View | Transforms numeric codes to readable text | Decoded statuses, demographics |
+| `int_payment_performance` | Table | Calculates payment reliability and customer value | 5-tier scoring system |
+| `int_utilisation_analysis` | Table | Analyses credit usage patterns | Corrected for negative balances |
+| `mart_customer_credit_profile` | Table | Complete customer view for decisions | Recommended actions |
+| `mart_credit_portfolio_summary` | Table | Executive dashboard by risk segment | Portfolio distribution |
+
+## 📊 Key Findings
+
+### Portfolio Distribution (Actual Results)
+
+| Action | % Customers | Count | Average Score | Avg Utilisation |
+|--------|------------|-------|---------------|-----------------|
+| 📈 INCREASE_LIMIT | 10.7% | 3,204 | 89.5 | 62.3% |
+| ✅ MAINTAIN | 62.2% | 18,673 | 75.2 | 41.8% |
+| ⚠️ MONITOR | 7.6% | 2,270 | 71.3 | 124.5% |
+| 🚨 REVIEW_ACCOUNT | 19.5% | 5,853 | 34.1 | 87.2% |
+
+### Risk Concentration
+- **830** customers with 3+ late payments requiring immediate review
+- **2,270** customers exceeding 90% utilisation showing financial stress
+- **3,204** premium customers eligible for limit increases
 
 ## 🚀 Setup & Usage
 
@@ -94,7 +132,34 @@ dbt run
 
 # Run tests
 dbt test
+
+# Generate and view documentation
+dbt docs generate
+dbt docs serve
 ```
+
+## 🧪 Testing Strategy
+
+### Test Coverage
+- ✅ **27 tests** implemented across all models
+- ✅ Business logic validation for recommended actions
+- ✅ Edge case handling for score boundaries (40, 60, 80, 100)
+- ✅ Utilisation calculation accuracy for negative balances
+- ✅ Custom macros for data quality checks
+
+### Test Results
+```bash
+Completed successfully
+================== 
+✓ 27 tests passed
+✗ 0 tests failed
+⚠ 0 warnings
+```
+
+### Key Test Validations
+- All INCREASE_LIMIT customers have score ≥80 and 50-75% utilisation
+- No premium customers (score ≥80) with >85% utilisation get MAINTAIN status
+- All score ≤40 customers correctly flagged for REVIEW_ACCOUNT
 
 ## 📊 Interactive Documentation
 
@@ -115,45 +180,13 @@ The documentation includes:
 - Test results and data lineage
 - Searchable interface for all project components
 
-![Data Pipeline DAG](docs/images/dag.png)
-
-## 📊 Key Findings
-
-### Portfolio Distribution
-
-| Segment | % Customers | Action |
-|---------|-------------|--------|
-| 📈 Growth Eligible | 8.3% | Increase |
-| ✅ Stable | 60.0% | Maintain |
-| ⚠️ Monitor | 23.3% | Watch |
-| 🚨 High Risk | 8.3% | Review |
-```
-
-## 🧪 Testing Strategy
-
-### Test Coverage
-- ✅ **16 tests** implemented
-- ✅ Uniqueness constraints
-- ✅ Not null validations
-- ✅ Accepted value checks
-- ✅ Custom business logic tests
-- ✅ Positive value validations
-
-### Test Results
-```bash
-Completed successfully
-================== 
-✓ 27 tests passed
-✗ 0 tests failed
-⚠ 0 warnings
-```
-
 ## 🔮 Future Enhancements
 - [ ] Add incremental loading for production scale
 - [ ] Implement Looker Studio dashboard
 - [ ] Add ML-based risk prediction
 - [ ] Include time-series trend analysis
 - [ ] Create API endpoints for real-time scoring
+- [ ] Expand to multi-product analysis (Term Loans, FlexiPay, Asset Finance)
 
 ## 🛠️ Technologies Used
 
@@ -179,10 +212,11 @@ credit_payment_analytics/
 ├── 📂 seeds/
 │   └── 📄 raw_credit_card_data.csv
 ├── 📂 tests/
-│   ├── 📄 assert_value_score_consistency.sql
 │   └── 📄 assert_recommended_action_logic.sql
 ├── 📂 macros/
 │   └── 📄 test_positive_values.sql
+├── 📂 analyses/
+│   └── 📄 EDA.ipynb
 ├── 📄 dbt_project.yml
 ├── 📄 requirements.txt
 └── 📄 README.md
