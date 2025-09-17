@@ -31,6 +31,7 @@ intermediate/         → Business calculations
   ↓
 marts/               → Decision-ready tables
 ```
+![Data Pipeline DAG](images/DAG.png)
 
 ## 🧮 Key Business Logic
 
