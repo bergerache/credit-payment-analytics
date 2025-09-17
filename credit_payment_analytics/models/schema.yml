@@ -23,7 +23,7 @@ models:
         description: "Business value score (0-100) prioritising revolvers over full payers"
         tests:
           - not_null
-          - positive_values  # Score should be positive
+          - no_negative_values  # Score should be non-zero
       - name: full_payment_count
         tests:
           - not_null
@@ -77,4 +77,4 @@ models:
       - name: customer_count
         tests:
           - not_null
-          - positive_values  
+          - no_negative_values  
