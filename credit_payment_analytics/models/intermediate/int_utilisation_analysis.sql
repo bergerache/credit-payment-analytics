@@ -6,12 +6,12 @@ WITH monthly_utilisation AS (
         credit_limit,
         
         -- Calculate utilisation for each month
-        ROUND(bill_amt_sep / NULLIF(credit_limit, 0) * 100, 2) as util_sep,
-        ROUND(bill_amt_aug / NULLIF(credit_limit, 0) * 100, 2) as util_aug,
-        ROUND(bill_amt_jul / NULLIF(credit_limit, 0) * 100, 2) as util_jul,
-        ROUND(bill_amt_jun / NULLIF(credit_limit, 0) * 100, 2) as util_jun,
-        ROUND(bill_amt_may / NULLIF(credit_limit, 0) * 100, 2) as util_may,
-        ROUND(bill_amt_apr / NULLIF(credit_limit, 0) * 100, 2) as util_apr
+        ROUND(GREATEST(bill_amt_sep, 0) / NULLIF(credit_limit, 0) * 100, 2) as util_sep,
+        ROUND(GREATEST(bill_amt_aug, 0) / NULLIF(credit_limit, 0) * 100, 2) as util_aug,
+        ROUND(GREATEST(bill_amt_jul, 0) / NULLIF(credit_limit, 0) * 100, 2) as util_jul,
+        ROUND(GREATEST(bill_amt_jun, 0) / NULLIF(credit_limit, 0) * 100, 2) as util_jun,
+        ROUND(GREATEST(bill_amt_may, 0) / NULLIF(credit_limit, 0) * 100, 2) as util_may,
+        ROUND(GREATEST(bill_amt_apr, 0) / NULLIF(credit_limit, 0) * 100, 2) as util_apr
         
     FROM {{ ref('stg_credit_card_data') }}
 )
