@@ -32,9 +32,7 @@ clean-targets:         # directories to be removed by `dbt clean`
 # files using the `{{ config(...) }}` macro.
 models:
   credit_payment_analytics:
-    # Config indicated by + and applies to all files under models/example/
-    example:
-      +materialized: view
+    
     # Staging layer - always views
     staging:
       +materialized: view
