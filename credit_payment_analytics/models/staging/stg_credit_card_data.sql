@@ -38,9 +38,9 @@ SELECT
     
     -- Decode payment statuses
     CASE PAY_0
-        WHEN -2 THEN 'no_consumption'
+        WHEN -2 THEN 'account_in_credit'
         WHEN -1 THEN 'paid_in_full'
-        WHEN 0 THEN 'revolving_credit'
+        WHEN 0 THEN 'minimum_payment_only'
         WHEN 1 THEN 'payment_delay_1m'
         WHEN 2 THEN 'payment_delay_2m'
         WHEN 3 THEN 'payment_delay_3m'
@@ -53,9 +53,9 @@ SELECT
     END as pay_status_sep,
     
     CASE PAY_2
-        WHEN -2 THEN 'no_consumption'
+        WHEN -2 THEN 'account_in_credit'
         WHEN -1 THEN 'paid_in_full'
-        WHEN 0 THEN 'revolving_credit'
+        WHEN 0 THEN 'minimum_payment_only'
         WHEN 1 THEN 'payment_delay_1m'
         WHEN 2 THEN 'payment_delay_2m'
         WHEN 3 THEN 'payment_delay_3m'
@@ -67,11 +67,11 @@ SELECT
         ELSE 'unknown'
     END as pay_status_aug,
     
-    -- Continue for other months...
+    
     CASE PAY_3
-        WHEN -2 THEN 'no_consumption'
+        WHEN -2 THEN 'account_in_credit'
         WHEN -1 THEN 'paid_in_full'
-        WHEN 0 THEN 'revolving_credit'
+        WHEN 0 THEN 'minimum_payment_only'
         WHEN 1 THEN 'payment_delay_1m'
         WHEN 2 THEN 'payment_delay_2m'
         WHEN 3 THEN 'payment_delay_3m'
@@ -84,9 +84,9 @@ SELECT
     END as pay_status_jul,
     
     CASE PAY_4
-        WHEN -2 THEN 'no_consumption'
+        WHEN -2 THEN 'account_in_credit'
         WHEN -1 THEN 'paid_in_full'
-        WHEN 0 THEN 'revolving_credit'
+        WHEN 0 THEN 'minimum_payment_only'
         WHEN 1 THEN 'payment_delay_1m'
         WHEN 2 THEN 'payment_delay_2m'
         WHEN 3 THEN 'payment_delay_3m'
@@ -99,9 +99,9 @@ SELECT
     END as pay_status_jun,
     
     CASE PAY_5
-        WHEN -2 THEN 'no_consumption'
+        WHEN -2 THEN 'account_in_credit'
         WHEN -1 THEN 'paid_in_full'
-        WHEN 0 THEN 'revolving_credit'
+        WHEN 0 THEN 'minimum_payment_only'
         WHEN 1 THEN 'payment_delay_1m'
         WHEN 2 THEN 'payment_delay_2m'
         WHEN 3 THEN 'payment_delay_3m'
@@ -114,9 +114,9 @@ SELECT
     END as pay_status_may,
     
     CASE PAY_6
-        WHEN -2 THEN 'no_consumption'
+        WHEN -2 THEN 'account_in_credit'
         WHEN -1 THEN 'paid_in_full'
-        WHEN 0 THEN 'revolving_credit'
+        WHEN 0 THEN 'minimum_payment_only'
         WHEN 1 THEN 'payment_delay_1m'
         WHEN 2 THEN 'payment_delay_2m'
         WHEN 3 THEN 'payment_delay_3m'
